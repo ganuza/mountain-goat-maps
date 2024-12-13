@@ -25,16 +25,33 @@ export default function MapPage() {
       const { lng, lat } = e.lngLat; // Extract clicked coordinates (longitude, latitude). This is destructuring e.lngLat:
       // const lng = e.lngLat.lng and const lat = e.lngLat.lat
 
+      const customPinDropMarker = document.createElement('div');
+      customPinDropMarker.className = 'custom-pin-drop-marker';
+      customPinDropMarker.style.backgroundImage = 'url(/assets/pin_drop_32dp_5084C1_FILL1_wght600_GRAD0_opsz40.png)'
+      customPinDropMarker.style.backgroundSize = 'cover';
+      customPinDropMarker.style.width = '48px';
+      customPinDropMarker.style.height = '48px';
+      customPinDropMarker.style.borderRadius = '50%';
+
       // Create a new marker at the clicked location
-      new mapboxgl.Marker()
+      new mapboxgl.Marker(customPinDropMarker)
         .setLngLat([lng, lat]) // Set marker's position using the constants you created above in the destructuring
         .addTo(map); // Add the marker to the map
 
       console.log(`Marker added at Longitude: ${lng}, Latitude: ${lat}`)
     })
 
+    // Custom Home Marker
+    const customHomeMarker = document.createElement('div');
+    customHomeMarker.className = 'custom-home-marker'
+    customHomeMarker.style.backgroundImage = 'url(/assets/home_pin_32dp_A96424_FILL1_wght600_GRAD0_opsz40.png)'
+    customHomeMarker.style.backgroundSize = 'cover'
+    customHomeMarker.style.width = '48px'
+    customHomeMarker.style.height = '48px'
+    customHomeMarker.style.borderRadius = '50%'
+
     // Add a default marker to the map
-    new mapboxgl.Marker() // Create a new marker instance
+    new mapboxgl.Marker(customHomeMarker) // Create a new marker instance
       .setLngLat([-104.9903, 39.7392]) // Set marker's longitude and latitude
       .addTo(map); // Add the marker to the map
 
