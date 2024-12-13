@@ -21,3 +21,21 @@ body {
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+.custom-pin-drop-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.custom-pin-drop-marker:hover {
+  transform: scale(1.2);
+}
+
+.custom-home-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.custom-home-marker:hover {
+  transform: scale(3);
+}
