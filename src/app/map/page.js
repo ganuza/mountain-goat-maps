@@ -18,6 +18,21 @@ export default function MapPage() {
       zoom: 10, // Initial zoom level
     })
 
+    // Add click event listener to the map
+    map.on('click', (e) => {
+      console.log('the whole event object:', e)
+      console.log('event coordinates:', e.lngLat)
+      const { lng, lat } = e.lngLat; // Extract clicked coordinates (longitude, latitude). This is destructuring e.lngLat:
+      // const lng = e.lngLat.lng and const lat = e.lngLat.lat
+
+      // Create a new marker at the clicked location
+      new mapboxgl.Marker()
+        .setLngLat([lng, lat]) // Set marker's position using the constants you created above in the destructuring
+        .addTo(map); // Add the marker to the map
+
+      console.log(`Marker added at Longitude: ${lng}, Latitude: ${lat}`)
+    })
+
     // Add a default marker to the map
     new mapboxgl.Marker() // Create a new marker instance
       .setLngLat([-104.9903, 39.7392]) // Set marker's longitude and latitude
