@@ -55,6 +55,23 @@ export default function MapPage() {
       .setLngLat([-104.9903, 39.7392]) // Set marker's longitude and latitude
       .addTo(map); // Add the marker to the map
 
+    // Add a GeolocateControl to the map
+    const geolocateControl = new mapboxgl.GeolocateControl ({
+      positionOptions: {
+        enableHichAccuracy: true, // Request high-accuracy geolocation
+      },
+      trackUserLocation: true, // Continuously track the user's location
+      showUserHeading: true, // Show the user's direction
+    });
+
+    map.addControl(geolocateControl, 'top-right'); // Add the contol to the map
+
+    // Automatically trigger the location tracking
+    geolocateControl.on('geolocate', (e) => {
+      const { longitude, latitude } = e.coords;
+      console.log(`User located at longitude: ${longitude}, Latitude: ${latitude}`);
+    });
+
     // Cleanup function to remove the map instance when the component is unmounted
     return () => map.remove(); // Cleanup map instance on unmount
   }, []);
