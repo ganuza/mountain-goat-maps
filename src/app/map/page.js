@@ -8,7 +8,8 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 
 export default function MapPage() {
   // Create a reference to the map container DOM element
-  const mapContainerRef = useRef(null);
+  const mapContainerRef = useRef(null); // Reference for the map container
+  const userMarkerRef = useRef(null); // Reference for the user's location marker
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -41,19 +42,20 @@ export default function MapPage() {
       console.log(`Marker added at Longitude: ${lng}, Latitude: ${lat}`)
     })
 
-    // Custom Home Marker
-    const customHomeMarker = document.createElement('div');
-    customHomeMarker.className = 'custom-home-marker'
-    customHomeMarker.style.backgroundImage = 'url(/assets/home_pin_32dp_A96424_FILL1_wght600_GRAD0_opsz40.png)'
-    customHomeMarker.style.backgroundSize = 'cover'
-    customHomeMarker.style.width = '48px'
-    customHomeMarker.style.height = '48px'
-    customHomeMarker.style.borderRadius = '50%'
+    // This commented out code was the initial Home Marker based on the Denver coordinates before using the geolocateControl for the lng, lat
+    // // Custom Home Marker
+    // const customHomeMarker = document.createElement('div');
+    // customHomeMarker.className = 'custom-home-marker'
+    // customHomeMarker.style.backgroundImage = 'url(/assets/home_pin_32dp_A96424_FILL1_wght600_GRAD0_opsz40.png)'
+    // customHomeMarker.style.backgroundSize = 'cover'
+    // customHomeMarker.style.width = '48px'
+    // customHomeMarker.style.height = '48px'
+    // customHomeMarker.style.borderRadius = '50%'
 
-    // Add a default marker to the map
-    new mapboxgl.Marker(customHomeMarker) // Create a new marker instance
-      .setLngLat([-104.9903, 39.7392]) // Set marker's longitude and latitude
-      .addTo(map); // Add the marker to the map
+    // // Add a default marker to the map
+    // new mapboxgl.Marker(customHomeMarker) // Create a new marker instance
+    //   .setLngLat([-104.9903, 39.7392]) // Set marker's longitude and latitude
+    //   .addTo(map); // Add the marker to the map
 
     // Add a GeolocateControl to the map
     const geolocateControl = new mapboxgl.GeolocateControl ({
@@ -70,6 +72,24 @@ export default function MapPage() {
     geolocateControl.on('geolocate', (e) => {
       const { longitude, latitude } = e.coords;
       console.log(`User located at longitude: ${longitude}, Latitude: ${latitude}`);
+
+      // If the marker already exists, update its position
+      if (userMarkerRef.current) {
+        userMarkerRef.current.setLngLat([longitude, latitude]);
+      } else {
+        // Create a custom marker for the first time
+        const customHomeMarker = document.createElement('div');
+        customHomeMarker.className = 'custom-home-marker'
+        customHomeMarker.style.backgroundImage = 'url(/assets/home_pin_32dp_A96424_FILL1_wght600_GRAD0_opsz40.png)'
+        customHomeMarker.style.backgroundSize = 'cover'
+        customHomeMarker.style.width = '48px'
+        customHomeMarker.style.height = '48px'
+        customHomeMarker.style.borderRadius = '50%'
+
+        userMarkerRef.current = new mapboxgl.Marker(customHomeMarker)
+          .setLngLat([longitude, latitude])
+          .addTo(map)
+      }
     });
 
     // Cleanup function to remove the map instance when the component is unmounted
