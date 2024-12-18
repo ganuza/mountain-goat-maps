@@ -2,6 +2,7 @@
 
 import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
+import 'mapbox-gl/dist/mapbox-gl.css'
 
 // Set the Mapbox API access token from environment variables
 mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
@@ -41,10 +42,18 @@ export default function MapPage() {
       customPinDropMarker.style.height = '48px';
       customPinDropMarker.style.borderRadius = '50%';
 
+      console.log(`Popup coordinates - Longitude: ${lng}, Latitude: ${lat}`)
+      // Create a new popup with coordinates
+      const popup = new mapboxgl.Popup({ offset: 25 }) // Adds a slight offset for better visibility
+        .setHTML(`<p>Longitude: ${lng.toFixed(4)}<br>Latitude: ${lat.toFixed(4)}</p>`);
+
       // Create a new marker at the clicked location and make it removable
       const userMarker = new mapboxgl.Marker(customPinDropMarker)
         .setLngLat([lng, lat]) // Set marker's position using the constants you created above in the destructuring
+        .setPopup(popup) // Attaches the popup to the marker
         .addTo(map); // Add the marker to the map
+
+      popup.addTo(map);
 
       console.log(`Marker added at Longitude: ${lng}, Latitude: ${lat}`)
 
