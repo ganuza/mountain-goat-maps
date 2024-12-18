@@ -1,6 +1,6 @@
 'use client'; // Required in Next.js for components that use client-side features
 
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import mapboxgl from 'mapbox-gl';
 
 // Set the Mapbox API access token from environment variables
@@ -9,8 +9,10 @@ mapboxgl.accessToken = process.env.NEXT_PUBLIC_MAPBOX_API_KEY;
 export default function MapPage() {
   // Create a reference to the map container DOM element
   const mapContainerRef = useRef(null); // Reference for the map container
+  const mapRef = useRef(null); // Reference to the map instance
   const userMarkerRef = useRef(null); // Reference for the user's location marker
   const userHeadingRef = useRef(null); // Reference for custom heading indicator
+  const [markers, setMarkers] = useState([]); // State to keep track of all markers
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -19,6 +21,8 @@ export default function MapPage() {
       center: [-104.9903, 39.7392], // Coordinates for Denver, CO
       zoom: 10, // Initial zoom level
     })
+
+    mapRef.current = map; // Save the map instance
 
     // Add click event listener to the map
     map.on('click', (e) => {
@@ -29,18 +33,34 @@ export default function MapPage() {
 
       const customPinDropMarker = document.createElement('div');
       customPinDropMarker.className = 'custom-pin-drop-marker';
+      customPinDropMarker.style.pointerEvents = 'auto';
+      customPinDropMarker.style.cursor = 'pointer'; // ensures a clickable cursor
       customPinDropMarker.style.backgroundImage = 'url(/assets/pin_drop_32dp_5084C1_FILL1_wght600_GRAD0_opsz40.png)'
       customPinDropMarker.style.backgroundSize = 'cover';
       customPinDropMarker.style.width = '48px';
       customPinDropMarker.style.height = '48px';
       customPinDropMarker.style.borderRadius = '50%';
 
-      // Create a new marker at the clicked location
-      new mapboxgl.Marker(customPinDropMarker)
+      // Create a new marker at the clicked location and make it removable
+      const userMarker = new mapboxgl.Marker(customPinDropMarker)
         .setLngLat([lng, lat]) // Set marker's position using the constants you created above in the destructuring
         .addTo(map); // Add the marker to the map
 
       console.log(`Marker added at Longitude: ${lng}, Latitude: ${lat}`)
+
+      // Add click event to remove the marker
+      customPinDropMarker.addEventListener('click', (event) => {
+        event.stopPropagation(); // Prevents the marker's click event from interfering with the map click event
+        userMarker.remove(); // Remove the marker from the map
+        setMarkers((prev) => prev.filter((m) => m !== userMarker))
+      })
+
+      // Update the markers state using the callback form of setState
+      setMarkers((prev) => {
+        const updatedMarkers = [...prev, userMarker];
+        console.log('Updated Markers Array: ', updatedMarkers);
+        return updatedMarkers
+      })
     })
 
     // This commented out code was the initial Home Marker based on the Denver coordinates before using the geolocateControl for the lng, lat
@@ -119,9 +139,22 @@ export default function MapPage() {
     return () => map.remove(); // Cleanup map instance on unmount
   }, []);
 
+  // Function to remove all markers
+  const clearAllMarkers = () => {
+    markers.forEach((marker) => marker.remove())
+    setMarkers([]); // Reset the markers state
+  }
+
   return(
-    <div className="h-screen">
+    <div className="h-screen relative ">
       <div ref={mapContainerRef} className="h-full" />
+      {/* Reset Markers Button */}
+      <button
+        onClick={clearAllMarkers}
+        className='absolute top-4 left-4 bg-red-500 text-white px-4 py-2 rounded shadow hover:bg-red-600'
+      >
+        Reset Markers
+      </button>
     </div>
   )
 }
