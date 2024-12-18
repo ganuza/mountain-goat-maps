@@ -2,6 +2,8 @@
 @tailwind components;
 @tailwind utilities;
 
+@import 'mapbox-gl/dist/mapbox-gl.css'; /* Global import of Mapbox CSS */
+
 :root {
   --background: #ffffff;
   --foreground: #171717;
@@ -18,4 +20,24 @@ body {
   color: var(--foreground);
   background: var(--background);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+.custom-pin-drop-marker {
+  cursor: pointer;
+  transition: transform 0.2s ease;
+}
+
+.custom-pin-drop-marker:hover {
+  transform: scale(1.2);
+}
+
+.custom-home-marker {
+  cursor: pointer;
+  border: 2px solid white;
+  box-shadow: 0px 2px 6px rgba(0, 0, 0, 0.2);
+  transition: transform 0.2s ease;
+}
+
+.custom-home-marker:hover {
+  transform: scale(3);
 }
