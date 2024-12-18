@@ -10,6 +10,7 @@ export default function MapPage() {
   // Create a reference to the map container DOM element
   const mapContainerRef = useRef(null); // Reference for the map container
   const userMarkerRef = useRef(null); // Reference for the user's location marker
+  const userHeadingRef = useRef(null); // Reference for custom heading indicator
 
   useEffect(() => {
     const map = new mapboxgl.Map({
@@ -60,17 +61,18 @@ export default function MapPage() {
     // Add a GeolocateControl to the map
     const geolocateControl = new mapboxgl.GeolocateControl ({
       positionOptions: {
-        enableHichAccuracy: true, // Request high-accuracy geolocation
+        enableHighAccuracy: true, // Request high-accuracy geolocation
       },
       trackUserLocation: true, // Continuously track the user's location
       showUserHeading: true, // Show the user's direction
+      showUserLocation: false, // Hide the default blue user location marker
     });
 
     map.addControl(geolocateControl, 'top-right'); // Add the contol to the map
 
     // Automatically trigger the location tracking
     geolocateControl.on('geolocate', (e) => {
-      const { longitude, latitude } = e.coords;
+      const { longitude, latitude, heading } = e.coords;
       console.log(`User located at longitude: ${longitude}, Latitude: ${latitude}`);
 
       // If the marker already exists, update its position
@@ -82,13 +84,34 @@ export default function MapPage() {
         customHomeMarker.className = 'custom-home-marker'
         customHomeMarker.style.backgroundImage = 'url(/assets/home_pin_32dp_A96424_FILL1_wght600_GRAD0_opsz40.png)'
         customHomeMarker.style.backgroundSize = 'cover'
-        customHomeMarker.style.width = '48px'
-        customHomeMarker.style.height = '48px'
+        customHomeMarker.style.width = '24px'
+        customHomeMarker.style.height = '24px'
         customHomeMarker.style.borderRadius = '50%'
 
         userMarkerRef.current = new mapboxgl.Marker(customHomeMarker)
           .setLngLat([longitude, latitude])
           .addTo(map)
+      }
+
+      // Add or update the heading indicator (direction arrow)
+      if (!userHeadingRef.current) {
+        const headingArrow = document.createElement('div');
+        headingArrow.className = 'user-heading-arrow';
+        headingArrow.style.width = '40px';
+        headingArrow.style.height = '40px';
+        headingArrow.style.backgroundImage = 'url(/icons8-north-direction-40.png)';
+        headingArrow.style.backgroundSize = 'cover';
+        headingArrow.style.transformOrigin = 'center';
+
+        userHeadingRef.current = new mapboxgl.Marker(headingArrow)
+          .setLngLat([longitude, latitude])
+          .addTo(map);
+      }
+
+      // Update heading arrow rotation if heading exists
+      if (userHeadingRef.current && heading !== null) {
+        userHeadingRef.current.setLngLat([longitude, latitude]);
+        userHeadingRef.current.getElement().style.transform = `rotate(${heading}deg)`;
       }
     });
 
